@@ -2,14 +2,8 @@ import express from 'express';
 import fs from 'fs';
 import path, { join } from 'path';
 import multer from 'multer';
+import { addData, deleteData, getData } from './data.service';
 const router = express.Router();
-
-interface Data {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-}
 
 const upload = multer({
   dest: 'uploads/',
@@ -27,13 +21,8 @@ const upload = multer({
 });
 
 router.get('/data', (req, res) => {
-  fs.readFile(join(__dirname, '../../db/example.json'), 'utf8', (err, data) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    res.send(data);
-  });
+  const data = getData();
+  res.send(data);
 });
 
 router.post(
@@ -50,25 +39,13 @@ router.post(
   upload.single('avatar'),
   (req, res) => {
     req.app.locals.uploading = false;
-    const data = fs.readFileSync(join(__dirname, '../../db/example.json'), 'utf8');
-    const parsedData: Data[] = JSON.parse(data);
-    const newData: Data = {
-      id: parsedData.length + 1,
-      name: req.body.name,
-      email: req.body.email,
-      avatar: '/' + req.file.path,
-    };
-    parsedData.push(newData);
-    fs.writeFileSync(join(__dirname, '../../db/example.json'), JSON.stringify(parsedData));
+    addData({ avatar: req.file.path, name: req.body.name, email: req.body.email });
     res.sendStatus(200);
   }
 );
 
 router.delete('/data/:id', (req, res) => {
-  const data = fs.readFileSync(join(__dirname, '../../db/example.json'), 'utf8');
-  const parsedData: Data[] = JSON.parse(data);
-  const newData = parsedData.filter((item) => item.id !== Number(req.params.id));
-  fs.writeFileSync(join(__dirname, '../../db/example.json'), JSON.stringify(newData));
+  deleteData(Number(req.params.id));
   res.sendStatus(200);
 });
 
