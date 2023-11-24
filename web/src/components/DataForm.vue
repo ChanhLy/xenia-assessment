@@ -18,7 +18,7 @@ export default {
 
       const form = document.querySelector('form');
       const formData = new FormData(form);
-      const resizedImage = await resize(formData.get('avatar'), 100);
+      const resizedImage = await resize(formData.get('avatar'));
       formData.set('avatar', resizedImage);
 
       axios

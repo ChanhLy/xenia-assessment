@@ -6,14 +6,8 @@ export async function resize(file: File, size = 256) {
   canvas.height = size;
 
   const bitmap = await createImageBitmap(file);
-  const { width, height } = bitmap;
 
-  const ratio = 1;
-
-  const x = 0;
-  const y = 0;
-
-  ctx?.drawImage(bitmap, 0, 0, size, size);
+  ctx?.drawImage(bitmap, 0, 0);
 
   return new Promise((resolve) => {
     canvas.toBlob(
